@@ -18,6 +18,10 @@
 #include <errno.h>
 /* contient les fonctions diverses nécessaires au programme */
 #include "Utils.h"
+/* code du serveur */
+#include "bal.h"
+/* code des client */
+#include "client.h"
 
 int puit_UDP_aff(int port, int taille_max, int n) {
 	// Créer un socket UDP 

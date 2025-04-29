@@ -17,7 +17,6 @@
 
 
 /**
-/**
  * Cette fonction récupère les messages envoyés par l'émetteur via le socket qui lui est dédié 
  * et les ajoute à la boîte aux lettres. Une fois tous les messages reçus, elle ferme le socket.
  *

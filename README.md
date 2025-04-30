@@ -16,7 +16,7 @@ This project implements a mailbox system in C that enables communication between
 To clone the project, use the following command:
 
 ```bash
-git clone
+git clone "https://github.com/AlainPiallat/tsock"
 ```
 
 ## Compilation

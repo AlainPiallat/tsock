@@ -16,7 +16,7 @@ Ce projet implémente un système de boîte aux lettres en C permettant la commu
 Pour cloner le projet, utilisez la commande suivante :
 
 ```bash
-git clone
+git clone "https://github.com/AlainPiallat/tsock"
 ```
 
 ## Compilation

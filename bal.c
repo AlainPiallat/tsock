@@ -112,13 +112,13 @@ int server(int port) {
 
             // Récupérer le nombre de messages
             char message_count_str[8];
-            strcpy(message_count_str, message + 9);
+            strncpy(message_count_str, message + 9, 8);
             message_count_str[8] = '\0';
             int message_count = string_to_int(message_count_str);
 
             // Récupérer le numéro de la boîte aux lettres
             char mailbox_number_str[8];
-            strcpy(mailbox_number_str, message + 17);
+            strncpy(mailbox_number_str, message + 17, 8);
             mailbox_number_str[8] = '\0';
             int mailbox_number = string_to_int(mailbox_number_str);
 
@@ -140,7 +140,7 @@ int server(int port) {
         } else if (message[0] == 'R') {
             // Récupérer le numéro de la boîte aux lettres
             char mailbox_number_str[8];
-            strcpy(mailbox_number_str, message + 1);
+            strncpy(mailbox_number_str, message + 1, 8);
             mailbox_number_str[8] = '\0';
             int mailbox_number = string_to_int(mailbox_number_str);
 

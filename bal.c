@@ -91,7 +91,7 @@ int server(int port) {
     // Accepter les connexions entrantes
     while (1) {
         struct sockaddr_in* source_address = (struct sockaddr_in*) malloc(sizeof(struct sockaddr_in));
-        int source_size = sizeof(struct sockaddr_in);
+        socklen_t source_size = (socklen_t) sizeof(struct sockaddr_in);
         // Accepter une nouvelle connexion
         int allocated_sock = accept(sock, source_address, &source_size);
         if (allocated_sock != -1) {

@@ -47,10 +47,10 @@ int puit_UDP_aff(int port, int taille_max, int n) {
 	{
 		// Lire un message du client 
 		struct sockaddr* adresse_expediteur = (struct sockaddr*) malloc(sizeof(struct sockaddr));
-		int taille_expediteur;
+		socklen_t taille_expediteur;
 		char message[taille_max];
 		if(recvfrom(sock, message, taille_max, 0, adresse_expediteur, &taille_expediteur) != -1) {
-			printf("PUITS: Reception n°%d (%d) [%s]\n", nb_receptions, strlen(message), message);
+			printf("PUITS: Reception n°%d (%ld) [%s]\n", nb_receptions, strlen(message), message);
 
 			// Incrémenter le nombre de réceptions
 			nb_receptions++;
@@ -67,6 +67,7 @@ int puit_UDP_aff(int port, int taille_max, int n) {
 	 
 	// Fermer le socket après utilisation #TODO question prof
 	close(sock);
+	return 0;
 }
 
 int source_UDP_aff(char* dest, int port, int n, int l) {
@@ -105,6 +106,7 @@ int source_UDP_aff(char* dest, int port, int n, int l) {
 	
 	// Fermer le socket après utilisation 
 	close(sock);
+	return 0;
 }
 
 int thread_puit_TCP_aff(int sock, int taille_max, int n) {
@@ -137,6 +139,7 @@ int thread_puit_TCP_aff(int sock, int taille_max, int n) {
 	
 	// Fermer le socket après la fin de la communication
 	close(sock);
+	return 0;
 }
 	
 int puit_TCP_aff(int port, int taille_max, int n) {
@@ -164,7 +167,7 @@ int puit_TCP_aff(int port, int taille_max, int n) {
 	while (1)
 	{
 		struct sockaddr_in* adresse_source = (struct sockaddr_in*) malloc(sizeof(struct sockaddr_in));
-		int taille_source = sizeof(struct sockaddr_in);
+		socklen_t taille_source = sizeof(struct sockaddr_in);
 		// Accèpter une nouvelle connexion 
 		int sock_alloue = accept(sock, adresse_source, &taille_source);
 		if (sock_alloue != -1) {
@@ -178,6 +181,7 @@ int puit_TCP_aff(int port, int taille_max, int n) {
 
 	// Fermer le socket principal 
 	close(sock);
+	return 0;
 }
 
 int source_TCP_aff(char* dest, int port, int n, int l) {
@@ -248,6 +252,7 @@ int source_TCP_aff(char* dest, int port, int n, int l) {
 
 	// Fermer le socket après utilisation 
 	close(sock);
+	return 0;
 }
 
 int main(int argc, char **argv) {

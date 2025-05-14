@@ -260,14 +260,15 @@ int main(int argc, char **argv) {
     extern char *optarg;
     extern int optind;
 
-    int nb_message = -1;  	// Nombre de messages à envoyer ou à recevoir
+    int nb_message = 10;  	// Nombre de messages à envoyer ou à recevoir
     int len_message = 30; 	// Taille des messages
+	int bal_num = -1;		// Numéro de la boîte aux lettres
     int mode = -1;        	// 0=puits, 1=source, 2=boite aux lettres, 3=émetteur, 4=récepteur
     int port = -1;        	// Port du serveur
     char *hostname = NULL; 	// Nom d'hôte pour les connexions client
 
     // Analyse des arguments
-    while ((c = getopt(argc, argv, "psn:l:ber")) != -1) {
+    while ((c = getopt(argc, argv, "psn:l:be:r:")) != -1) {
         switch (c) {
             case 'p':
                 if (mode != -1) {
@@ -299,6 +300,12 @@ int main(int argc, char **argv) {
                     exit(1);
                 }
                 mode = 3; // Mode émetteur
+				if (optarg != NULL) {
+					bal_num = atoi(optarg); // Numéro de la boîte aux lettres
+				} else {
+					printf("Erreur : numéro de boîte aux lettres requis pour le mode émetteur.\n");
+					exit(1);
+				}
                 break;
 
             case 'r':
@@ -307,6 +314,12 @@ int main(int argc, char **argv) {
                     exit(1);
                 }
                 mode = 4; // Mode récepteur
+				if (optarg != NULL) {
+					bal_num = atoi(optarg); // Numéro de la boîte aux lettres
+				} else {
+					printf("Erreur : numéro de boîte aux lettres requis pour le mode récepteur.\n");
+					exit(1);
+				}
                 break;
 
             case 'n':
@@ -361,7 +374,7 @@ int main(int argc, char **argv) {
                 printf("Erreur : le nom d'hôte est requis pour le mode émetteur.\n");
                 exit(1);
             }
-            emitter(hostname, port, len_message, nb_message, 0); // Numéro de boîte aux lettres par défaut : 0
+            emitter(hostname, port, len_message, nb_message, bal_num);
             break;
 
         case 4: // Mode récepteur
@@ -370,7 +383,7 @@ int main(int argc, char **argv) {
                 printf("Erreur : le nom d'hôte est requis pour le mode récepteur.\n");
                 exit(1);
             }
-            receiver(hostname, port, 0); // Numéro de boîte aux lettres par défaut : 0
+            receiver(hostname, port, bal_num);
             break;
 
         default:

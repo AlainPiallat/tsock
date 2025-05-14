@@ -76,6 +76,9 @@ int server(int port) {
     struct sockaddr_in* local_address = (struct sockaddr_in*) malloc(sizeof(struct sockaddr_in));
 
     construire_adresse_local(port, local_address);
+	
+	// Lier le socket à l'adresse locale 
+	bind(sock, local_address, sizeof(struct sockaddr_in));
 
     // Écouter les connexions entrantes
     listen(sock, 5);

@@ -37,8 +37,10 @@ int emitter(char *hostname, int port, int length, int count, int number) {
         perror("Erreur lors de la connexion au serveur");
         close(sock);
         return -1;
+    } else {
+        printf("Connecté au serveur %s sur le port %d\n", hostname, port);
     }
-
+    
     // Envoi du message d'initialisation
     char init_msg[9];
     snprintf(init_msg, sizeof(init_msg), "E%d%d%d", length, count, number);
@@ -46,6 +48,8 @@ int emitter(char *hostname, int port, int length, int count, int number) {
         perror("Erreur lors de l'envoi du message d'initialisation");
         close(sock);
         return -1;
+    } else {
+        printf("Emetteur : envoi de %d messages de longueur %d à la boîte aux lettres %d\n", count, length, number);
     }
 
     // Envoi des messages
@@ -105,6 +109,8 @@ int receiver(char *hostname, int port, int number) {
         perror("Erreur lors de la connexion au serveur");
         close(sock);
         return -1;
+    } else {
+        printf("Connecté au serveur %s sur le port %d\n", hostname, port);
     }
 
     // Envoi du message d'initialisation
@@ -114,6 +120,8 @@ int receiver(char *hostname, int port, int number) {
         perror("Erreur lors de l'envoi du message d'initialisation");
         close(sock);
         return -1;
+    } else {
+        printf("Récepteur : demande de messages pour la boîte aux lettres %d\n", number);
     }
 
     // Réception des messages

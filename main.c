@@ -343,7 +343,7 @@ int main(int argc, char **argv) {
     port = string_to_int(argv[argc - 1]);
 
     if (mode == -1 || port == -1) {
-        printf("Usage : %s [-p|-s|-b|-e|-r] [-n nb_message] [-l len_message] [hostname] port\n", argv[0]);
+        printf("Usage : %s [-p|-s|-b|-e bal_num|-r bal_num] [-n nb_message] [-l len_message] [hostname] port\n", argv[0]);
         exit(1);
     }
 

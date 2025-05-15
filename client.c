@@ -42,8 +42,14 @@ int emitter(char *hostname, int port, int length, int count, int number) {
     }
     
     // Envoi du message d'initialisation
-    char init_msg[9];
-    snprintf(init_msg, sizeof(init_msg), "E%d%d%d", length, count, number);
+    char init_msg[13];
+    union int_char length_str;
+    union int_char count_str;
+    union int_char number_str;
+    length_str.i = length;
+    count_str.i = count;
+    number_str.i = number;
+    snprintf(init_msg, sizeof(init_msg), "E%s%s%s", length_str.c, count_str.c, number_str.c);
     if (send(sock, init_msg, sizeof(init_msg), 0) < 0) {
         perror("Erreur lors de l'envoi du message d'initialisation");
         close(sock);
@@ -66,6 +72,8 @@ int emitter(char *hostname, int port, int length, int count, int number) {
             free(message);
             close(sock);
             return -1;
+        } else {
+            printf("EMETTEUR: Envoi n°%d (%d) [%s]\n", i + 1, length, message);
         }
     }
     free(message);
@@ -115,7 +123,9 @@ int receiver(char *hostname, int port, int number) {
 
     // Envoi du message d'initialisation
     char init_msg[5];
-    snprintf(init_msg, sizeof(init_msg), "R%d", number);
+    union int_char number_str;
+    number_str.i = number;
+    snprintf(init_msg, sizeof(init_msg), "R%s", number_str.c);
     if (send(sock, init_msg, sizeof(init_msg), 0) < 0) {
         perror("Erreur lors de l'envoi du message d'initialisation");
         close(sock);

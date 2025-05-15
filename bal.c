@@ -2,6 +2,8 @@
 
 
 int server_sender(int sock, mailbox *mbox, int length, int count) {
+    // Informer de la création du socket
+    printf("SERVER_SENDER: Socket created\n");
     for (int i = 0; i < count; i++) {
         // Allouer un buffer pour recevoir le message
         char *message = (char *)malloc(length);
@@ -40,6 +42,8 @@ int server_sender(int sock, mailbox *mbox, int length, int count) {
 
 // Fonction pour gérer la réception des messages par le récepteur
 int server_receiver(int sock, mailbox *mbox) {
+    // Informer de la création du socket
+    printf("SERVER_RECEIVER: Socket created\n");
     while (1) {
         // Récupérer un message depuis la boîte aux lettres
         int length;
@@ -97,33 +101,34 @@ int server(int port) {
         socklen_t source_size = (socklen_t) sizeof(struct sockaddr_in);
         // Accepter une nouvelle connexion
         int allocated_sock = accept(sock, source_address, &source_size);
-        if (allocated_sock != -1) {
+        if (allocated_sock == -1) {
+            perror("SERVER: socket not created");
             continue;
         }
         
         // Récupérer le message d'initialisation
-        char message[30];
+        char message[13];
         int message_size = sizeof(message);
         recv(allocated_sock, message, message_size, 0);
         printf("SERVER: initialisation message: %s\n", message);
         if (message[0] == 'E') {
             // Récupérer la taille des messages
-            char message_length_str[8];
-            strcpy(message_length_str, message + 1);
-            message_length_str[8] = '\0';
-            int message_length = string_to_int(message_length_str);
+            union int_char message_length_str;
+            strncpy(message_length_str.c, message + 1, 4);
+            message_length_str.c[4] = '\0';
+            int message_length = message_length_str.i;            
 
             // Récupérer le nombre de messages
-            char message_count_str[8];
-            strncpy(message_count_str, message + 9, 8);
-            message_count_str[8] = '\0';
-            int message_count = string_to_int(message_count_str);
+            union int_char message_count_str;
+            strncpy(message_count_str.c, message + 5, 4);
+            message_count_str.c[4] = '\0';
+            int message_count = message_count_str.i;
 
             // Récupérer le numéro de la boîte aux lettres
-            char mailbox_number_str[8];
-            strncpy(mailbox_number_str, message + 17, 8);
-            mailbox_number_str[8] = '\0';
-            int mailbox_number = string_to_int(mailbox_number_str);
+            union int_char mailbox_number_str;
+            strncpy(mailbox_number_str.c, message + 9, 4);
+            mailbox_number_str.c[4] = '\0';
+            int mailbox_number = mailbox_number_str.i;
 
             // Afficher les informations récupérées
             printf("SERVER: message_length=%d, message_count=%d, mailbox_number=%d\n", message_length, message_count, mailbox_number);

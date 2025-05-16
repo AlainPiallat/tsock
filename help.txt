@@ -1,0 +1,35 @@
+tsock - Utilitaire de communication réseau (puits, source, serveur, émetteur, récepteur)
+
+USAGE :
+    ./tsock [MODES] [OPTIONS] [hostname] port
+
+MODES (un seul obligatoire) :
+    -p              Mode puits (réception de messages)
+    -s              Mode source (envoi de messages)
+    -b              Mode serveur (boîte aux lettres centrale)
+    -e bal_num      Mode émetteur (envoi vers la boîte aux lettres numéro bal_num)
+    -r bal_num      Mode récepteur (lecture de la boîte aux lettres numéro bal_num)
+    -h              Affiche cette aide
+
+OPTIONS :
+    -u              Utilise le protocole UDP (par défaut : TCP) 
+                    (utilisé avec -p et -s uniquement)
+    -n nb_message   Nombre de messages à envoyer ou recevoir (défaut : 10)
+                    (utilisé avec -p, -s, -e, -r)
+    -l len_message  Longueur des messages (défaut : 30)
+                    (utilisé avec -p, -s, -e)
+
+ARGUMENTS :
+    hostname        Nom d'hôte du serveur (requis pour source, émetteur, récepteur)
+    port            Port d'écoute ou de connexion
+
+EXEMPLES :
+    ./tsock -p -n 5 -l 40 12345
+    ./tsock -s -n 5 -l 40 localhost 12345
+    ./tsock -b 12345
+    ./tsock -e 2 localhost 12345
+    ./tsock -r 2 localhost 12345
+
+NOTES :
+    - Un seul mode (-p, -s, -b, -e, -r) doit être spécifié à la fois.
+    - Utilisez -h pour afficher cette aide.

@@ -36,23 +36,44 @@ To compile the project, use the provided `makefile`. The generated executable wi
 
 ### Usage
 
-The `tsock` executable should be run with the following arguments:
+The `tsock` executable should be run with the following syntax:
 
 ```bash
-./tsock [-p|-s|-b|-e|-r] [-n nb_message] [-l len_message] [hostname] port
+./tsock [MODES] [OPTIONS] [hostname] port
 ```
 
-Options:
+#### MODES (only one required):
+- `-p`              Sink mode (receiving messages)
+- `-s`              Source mode (sending messages)
+- `-b`              Server mode (central mailbox)
+- `-e bal_num`      Sender mode (send to mailbox number `bal_num`)
+- `-r bal_num`      Receiver mode (read from mailbox number `bal_num`)
+- `-h`              Display this help message
 
-- `-p` : Sink mode (receiving messages).
-- `-s` : Source mode (sending messages).
-- `-b` : Server mode (mailbox).
-- `-e` : Sender mode.
-- `-r` : Receiver mode.
-- `-n` : Number of messages to send or receive.
-- `-l` : Length of messages.
-- `hostname` : Hostname for client connections.
-- `port` : Listening or connection port.
+#### OPTIONS:
+- `-u`              Use UDP protocol (default: TCP)  
+                    *(used only with -p and -s)*
+- `-n nb_message`   Number of messages to send or receive (default: 10)  
+                    *(used with -p, -s, -e, -r)*
+- `-l len_message`  Length of messages (default: 30)  
+                    *(used with -p, -s, -e)*
+
+#### ARGUMENTS:
+- `hostname`        Server hostname (required for source, sender, receiver)
+- `port`            Listening or connection port
+
+#### EXAMPLES:
+```bash
+./tsock -p -n 5 -l 40 12345
+./tsock -s -n 5 -l 40 localhost 12345
+./tsock -b 12345
+./tsock -e 2 localhost 12345
+./tsock -r 2 localhost 12345
+```
+
+**Notes:**
+- Only one mode (`-p`, `-s`, `-b`, `-e`, `-r`) should be specified at a time.
+- Use `-h` to display the full help message.
 
 ## Dependencies
 

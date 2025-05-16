@@ -22,6 +22,8 @@
 #include "bal.h"
 /* code des client */
 #include "client.h"
+/* autre librairie */
+#include <stdio.h>
 
 int puit_UDP_aff(int port, int taille_max, int n) {
 	// Créer un socket UDP 
@@ -269,7 +271,7 @@ int main(int argc, char **argv) {
     char *hostname = NULL; 	// Nom d'hôte pour les connexions client
 
     // Analyse des arguments
-    while ((c = getopt(argc, argv, "psun:l:be:r:")) != -1) {
+    while ((c = getopt(argc, argv, "psun:l:be:r:h")) != -1) {
         switch (c) {
             case 'p':
                 if (mode != -1) {
@@ -335,8 +337,24 @@ int main(int argc, char **argv) {
                 len_message = atoi(optarg);
                 break;
 
+			case 'h':
+				// Afficher le manuel d'utilisation (help.txt)
+				FILE *file = fopen("help.txt", "r");
+				if (file == NULL) {
+					perror("Erreur lors de l'ouverture du fichier d'aide");
+					exit(1);
+				}
+				char line[256];
+				while (fgets(line, sizeof(line), file) != NULL) {
+					printf("%s", line);
+				}
+				fclose(file);
+				exit(0);
+				break;
+
             default:
-                printf("Usage : %s [-p|-s|-b|-e bal_num|-r bal_num] [-u] [-n nb_message] [-l len_message] [hostname] port\n", argv[0]);
+                printf("Usage : %s [-p|-s|-b|-e bal_num|-r bal_num|-h] [-u] [-n nb_message] [-l len_message] [hostname] port\n", argv[0]);
+				printf("Pour plus d'informations : %s -h\n", argv[0]);
                 exit(1);
         }
     }
@@ -348,7 +366,8 @@ int main(int argc, char **argv) {
     port = string_to_int(argv[argc - 1]);
 
     if (mode == -1 || port == -1) {
-        printf("Usage : %s [-p|-s|-b|-e bal_num|-r bal_num] [-u] [-n nb_message] [-l len_message] [hostname] port\n", argv[0]);
+        printf("Usage : %s [-p|-s|-b|-e bal_num|-r bal_num|-h] [-u] [-n nb_message] [-l len_message] [hostname] port\n", argv[0]);
+		printf("Pour plus d'informations : %s -h\n", argv[0]);
         exit(1);
     }
 

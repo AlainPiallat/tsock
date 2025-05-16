@@ -36,23 +36,44 @@ Pour compiler le projet, utilisez le fichier `makefile` fourni. L'exécutable g�
   
 ### Utilisation
 
-L'exécutable `tsock` doit être lancé avec les arguments suivants :
+L'exécutable `tsock` doit être lancé avec la syntaxe suivante :
 
 ```bash
-./tsock [-p|-s|-b|-e|-r] [-n nb_message] [-l len_message] [hostname] port
+./tsock [MODES] [OPTIONS] [hostname] port
 ```
 
-Options :
+#### MODES (un seul obligatoire) :
+- `-p`              Mode puits (réception de messages)
+- `-s`              Mode source (envoi de messages)
+- `-b`              Mode serveur (boîte aux lettres centrale)
+- `-e bal_num`      Mode émetteur (envoi vers la boîte aux lettres numéro `bal_num`)
+- `-r bal_num`      Mode récepteur (lecture de la boîte aux lettres numéro `bal_num`)
+- `-h`              Affiche l'aide
 
-- `-p` : Mode puits (réception de messages).
-- `-s` : Mode source (envoi de messages).
-- `-b` : Mode serveur (boîte aux lettres).
-- `-e` : Mode émetteur.
-- `-r` : Mode récepteur.
-- `-n` : Nombre de messages à envoyer ou recevoir.
-- `-l` : Longueur des messages.
-- `hostname` : Nom d'hôte pour les connexions client.
-- `port` : Port d'écoute ou de connexion.
+#### OPTIONS :
+- `-u`              Utilise le protocole UDP (par défaut : TCP)  
+                    *(utilisé avec -p et -s uniquement)*
+- `-n nb_message`   Nombre de messages à envoyer ou recevoir (défaut : 10)  
+                    *(utilisé avec -p, -s, -e, -r)*
+- `-l len_message`  Longueur des messages (défaut : 30)  
+                    *(utilisé avec -p, -s, -e)*
+
+#### ARGUMENTS :
+- `hostname`        Nom d'hôte du serveur (requis pour source, émetteur, récepteur)
+- `port`            Port d'écoute ou de connexion
+
+#### EXEMPLES :
+```bash
+./tsock -p -n 5 -l 40 12345
+./tsock -s -n 5 -l 40 localhost 12345
+./tsock -b 12345
+./tsock -e 2 localhost 12345
+./tsock -r 2 localhost 12345
+```
+
+**Notes :**
+- Un seul mode (`-p`, `-s`, `-b`, `-e`, `-r`) doit être spécifié à la fois.
+- Utilisez `-h` pour afficher l'aide complète.
 
 ## Dépendances
 

@@ -6,10 +6,10 @@ LDFLAGS = -pthread
 OBJS = main.o client.o bal.o chained_list.o Utils.o
 
 # Cible principale
-all: main
+all: tsock
 
 # Génération de l'exécutable
-main: $(OBJS)
+tsock: $(OBJS)
 	$(CC) -o $@ $(OBJS) $(LDFLAGS)
 
 # Règle générique pour compiler les fichiers .c en .o
@@ -18,5 +18,5 @@ main: $(OBJS)
 
 # Nettoyage des fichiers générés
 clean:
-	rm -f main
+	rm -f tsock
 	rm -f *.o

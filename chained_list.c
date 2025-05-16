@@ -102,3 +102,29 @@ char *get_message(mailbox *mail_box, int *length) {
 
     return content; // Retourner le message
 }
+
+void print_mailboxes(mailbox *mailboxes) {
+    if (mailboxes == NULL) {
+        printf("Aucune boite aux lettres.\n");
+        return;
+    }
+
+    mailbox *current_mailbox = mailboxes;
+    while (current_mailbox != NULL) {
+        printf("Boite aux lettres %d:\n", current_mailbox->number);
+
+        message *current_message = current_mailbox->messages;
+        if (current_message == NULL) {
+            printf("  Aucun message.\n");
+        } else {
+            int message_index = 1;
+            while (current_message != NULL) {
+                printf("  Message %d: %s (longueur: %d)\n", message_index, current_message->content, current_message->length);
+                current_message = current_message->next;
+                message_index++;
+            }
+        }
+
+        current_mailbox = current_mailbox->next;
+    }
+}

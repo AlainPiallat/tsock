@@ -2,6 +2,7 @@
 #define CHAINED_LIST_H
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 // Structures de données
@@ -65,5 +66,11 @@ int add_message(mailbox *mail_box, char *msg, int length);
  */
 char *get_message(mailbox *mail_box, int *length);
 
+/**
+ * Affiche toutes les boites aux lettres et leurs contenus.
+ * 
+ * @param mailboxes Pointeur vers la liste chaînée de boites aux lettres.
+ */
+void print_mailboxes(mailbox *mailboxes);
 
 #endif // CHAINED_LIST_H

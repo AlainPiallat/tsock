@@ -265,10 +265,11 @@ int main(int argc, char **argv) {
 	int bal_num = -1;		// Numéro de la boîte aux lettres
     int mode = -1;        	// 0=puits, 1=source, 2=boite aux lettres, 3=émetteur, 4=récepteur
     int port = -1;        	// Port du serveur
+	int protocol = 0;		// Protocole (0=TCP, 1=UDP)
     char *hostname = NULL; 	// Nom d'hôte pour les connexions client
 
     // Analyse des arguments
-    while ((c = getopt(argc, argv, "psn:l:be:r:")) != -1) {
+    while ((c = getopt(argc, argv, "psun:l:be:r:")) != -1) {
         switch (c) {
             case 'p':
                 if (mode != -1) {
@@ -285,6 +286,10 @@ int main(int argc, char **argv) {
                 }
                 mode = 1; // Mode source
                 break;
+
+			case 'u':
+				int protocol = 1; // Protocole UDP
+				break;
 
             case 'b':
                 if (mode != -1) {
@@ -331,7 +336,7 @@ int main(int argc, char **argv) {
                 break;
 
             default:
-                printf("Usage : %s [-p|-s|-b|-e|-r] [-n nb_message] [-l len_message] [hostname] port\n", argv[0]);
+                printf("Usage : %s [-p|-s|-b|-e bal_num|-r bal_num] [-u] [-n nb_message] [-l len_message] [hostname] port\n", argv[0]);
                 exit(1);
         }
     }
@@ -343,25 +348,35 @@ int main(int argc, char **argv) {
     port = string_to_int(argv[argc - 1]);
 
     if (mode == -1 || port == -1) {
-        printf("Usage : %s [-p|-s|-b|-e bal_num|-r bal_num] [-n nb_message] [-l len_message] [hostname] port\n", argv[0]);
+        printf("Usage : %s [-p|-s|-b|-e bal_num|-r bal_num] [-u] [-n nb_message] [-l len_message] [hostname] port\n", argv[0]);
         exit(1);
     }
 
     // Exécution en fonction du mode
     switch (mode) {
-        case 0: // Mode puits
-            printf("Mode : Puits\n");
-            puit_TCP_aff(port, len_message, nb_message);
+		case 0: // Mode puits
+			if (protocol == 1) {
+				printf("Mode : Puits (UDP)\n");
+				puit_UDP_aff(port, len_message, nb_message);
+			} else {
+				printf("Mode : Puits (TCP)\n");
+				puit_TCP_aff(port, len_message, nb_message);
+			}
             break;
 
         case 1: // Mode source
-            printf("Mode : Source\n");
             if (hostname == NULL) {
                 printf("Erreur : le nom d'hôte est requis pour le mode source.\n");
                 exit(1);
             }
-            source_TCP_aff(hostname, port, nb_message, len_message);
-            break;
+			if (protocol == 1) {
+				printf("Mode : Source (UDP)\n");
+				source_UDP_aff(hostname, port, nb_message, len_message);
+			} else {
+				printf("Mode : Source (TCP)\n");
+				source_TCP_aff(hostname, port, nb_message, len_message);
+			}
+			break;
 
         case 2: // Mode boîte aux lettres (serveur)
             printf("Mode : Serveur (Boîte aux lettres)\n");

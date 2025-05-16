@@ -42,14 +42,18 @@ int emitter(char *hostname, int port, int length, int count, int number) {
     }
     
     // Envoi du message d'initialisation
-    char init_msg[13];
+    char init_msg[14];
     union int_char length_str;
     union int_char count_str;
     union int_char number_str;
     length_str.i = length;
     count_str.i = count;
     number_str.i = number;
-    snprintf(init_msg, sizeof(init_msg), "E%s%s%s", length_str.c, count_str.c, number_str.c);
+    strcpy(init_msg, "E");
+    strncpy(init_msg + 1, length_str.c, 4);
+    strncpy(init_msg + 5, count_str.c, 4);
+    strncpy(init_msg + 9, number_str.c, 4);
+    init_msg[13] = '\0'; // Null-terminate the string
     if (send(sock, init_msg, sizeof(init_msg), 0) < 0) {
         perror("Erreur lors de l'envoi du message d'initialisation");
         close(sock);
@@ -122,10 +126,12 @@ int receiver(char *hostname, int port, int number) {
     }
 
     // Envoi du message d'initialisation
-    char init_msg[5];
+    char init_msg[6];
     union int_char number_str;
     number_str.i = number;
-    snprintf(init_msg, sizeof(init_msg), "R%s", number_str.c);
+    strcpy(init_msg, "R");
+    strncpy(init_msg + 1, number_str.c, 4);
+    init_msg[5] = '\0'; // Null-terminate the string
     if (send(sock, init_msg, sizeof(init_msg), 0) < 0) {
         perror("Erreur lors de l'envoi du message d'initialisation");
         close(sock);
@@ -135,17 +141,28 @@ int receiver(char *hostname, int port, int number) {
     }
 
     // Réception des messages
-    char buffer[1024];
-    int bytes_received;
-    while ((bytes_received = recv(sock, buffer, sizeof(buffer) - 1, 0)) > 0) {
-        buffer[bytes_received] = '\0'; // Null-terminate the received data
-        printf("Message reçu : %s\n", buffer);
+    // Pour chaque message, on reçoit d'abord la longueur du message
+    int i = 0;
+    union int_char length_str;
+    while (recv(sock, length_str.c, 4, 0) > 0) {
+        int length = length_str.i;
+        char *message = malloc(length);
+        if (!message) {
+            perror("Erreur d'allocation mémoire");
+            close(sock);
+            return -1;
+        }
+        if (recv(sock, message, length, 0) < 0) {
+            perror("Erreur lors de la réception d'un message");
+            free(message);
+            close(sock);
+            return -1;
+        } else {
+            printf("RECEPTEUR: Réception n°%d (%d) [%s]\n", ++i, length, message);
+        }
+        free(message);
     }
-    if (bytes_received < 0) {
-        perror("Erreur lors de la réception des messages");
-        close(sock);
-        return -1;
-    }
+    
 
     // Fermeture de la connexion
     close(sock);

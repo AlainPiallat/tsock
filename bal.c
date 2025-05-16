@@ -30,6 +30,9 @@ int server_sender(int sock, mailbox *mbox, int length, int count) {
             return -1;
         }
 
+        // Informer de l'ajout du message
+        printf("SERVER_SENDER: Message added to mailbox %d\n", mbox->number);
+
         // Libérer le buffer après ajout
         free(message);
     }
@@ -44,27 +47,36 @@ int server_sender(int sock, mailbox *mbox, int length, int count) {
 int server_receiver(int sock, mailbox *mbox) {
     // Informer de la création du socket
     printf("SERVER_RECEIVER: Socket created\n");
-    while (1) {
-        // Récupérer un message depuis la boîte aux lettres
-        int length;
-        char *message = get_message(mbox, &length);
-        if (message == NULL) {
-            // Plus de messages à envoyer
-            break;
+    int length;
+    char *message;
+    while ((message = get_message(mbox, &length)) != NULL) {
+        // Envoyer la taille du message au récepteur
+        union int_char message_length_str;
+        message_length_str.i = length;
+        if (send(sock, message_length_str.c, sizeof(int), 0) <= 0) {
+            perror("SERVER_RECEIVER: Error sending message length");
+            free(message);
+            close(sock);
+            return -1;
         }
 
         // Envoyer le message au récepteur via le socket
-        int sent = send(sock, message, length, 0);
-        if (sent <= 0) {
+        if (send(sock, message, length, 0) <= 0) {
             perror("SERVER_RECEIVER: Error sending message");
             free(message);
             close(sock);
             return -1;
         }
 
+        // Informer de l'envoi du message
+        printf("SERVER_RECEIVER: Message sent to receiver\n");
+
         // Libérer le buffer après envoi
         free(message);
     }
+
+    // Informer de la fin de l'envoi
+    printf("SERVER_RECEIVER: No more messages to send\n");
 
     // Fermer le socket après envoi de tous les messages
     shutdown(sock, 2);
@@ -80,9 +92,9 @@ int server(int port) {
     struct sockaddr_in* local_address = (struct sockaddr_in*) malloc(sizeof(struct sockaddr_in));
 
     construire_adresse_local(port, local_address);
-	
-	// Lier le socket à l'adresse locale 
-	bind(sock, local_address, sizeof(struct sockaddr_in));
+    
+    // Lier le socket à l'adresse locale 
+    bind(sock, local_address, sizeof(struct sockaddr_in));
 
     // Écouter les connexions entrantes
     listen(sock, 5);
@@ -110,24 +122,21 @@ int server(int port) {
         char message[13];
         int message_size = sizeof(message);
         recv(allocated_sock, message, message_size, 0);
-        printf("SERVER: initialisation message: %s\n", message);
+        printf("SERVER: initialisation message received\n");
         if (message[0] == 'E') {
             // Récupérer la taille des messages
             union int_char message_length_str;
             strncpy(message_length_str.c, message + 1, 4);
-            message_length_str.c[4] = '\0';
             int message_length = message_length_str.i;            
 
             // Récupérer le nombre de messages
             union int_char message_count_str;
             strncpy(message_count_str.c, message + 5, 4);
-            message_count_str.c[4] = '\0';
             int message_count = message_count_str.i;
 
             // Récupérer le numéro de la boîte aux lettres
             union int_char mailbox_number_str;
             strncpy(mailbox_number_str.c, message + 9, 4);
-            mailbox_number_str.c[4] = '\0';
             int mailbox_number = mailbox_number_str.i;
 
             // Afficher les informations récupérées
@@ -145,12 +154,11 @@ int server(int port) {
                 printf("SERVER: Error in server_sender\n");
                 continue;
             }
-        } else if (message[0] == 'R') {
+        } else if (message[0] == 'R') { 
             // Récupérer le numéro de la boîte aux lettres
-            char mailbox_number_str[8];
-            strncpy(mailbox_number_str, message + 1, 8);
-            mailbox_number_str[8] = '\0';
-            int mailbox_number = string_to_int(mailbox_number_str);
+            union int_char mailbox_number_str;
+            strncpy(mailbox_number_str.c, message + 1, 4);
+            int mailbox_number = mailbox_number_str.i;
 
             // Afficher les informations récupérées
             printf("SERVER: mailbox_number=%d\n", mailbox_number);

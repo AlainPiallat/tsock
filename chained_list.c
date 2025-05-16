@@ -6,6 +6,18 @@ int initialize_mailbox(mailbox **mailboxes) {
 }
 
 mailbox *get_mailbox(mailbox **mailboxes, int number) {
+    // Vérifier si la liste des boites aux lettres est vide
+    if (*mailboxes == NULL) {
+        // La liste est vide, on crée la première boite aux lettres
+        printf("Création de la boite aux lettres %d\n", number);
+        mailbox *new_mailbox = (mailbox *)malloc(sizeof(mailbox));
+        new_mailbox->number = number;
+        new_mailbox->messages = NULL;
+        new_mailbox->next = NULL;
+        *mailboxes = new_mailbox; // Mettre à jour la liste
+        return new_mailbox; // Retourner la nouvelle boite aux lettres
+    }
+
     mailbox *current = *mailboxes;
     mailbox *previous = NULL;
 
@@ -19,17 +31,14 @@ mailbox *get_mailbox(mailbox **mailboxes, int number) {
     }
 
     // Si la boite aux lettres n'existe pas, on la crée
+    printf("Création de la boite aux lettres %d\n", number);
     mailbox *new_mailbox = (mailbox *)malloc(sizeof(mailbox));
     new_mailbox->number = number;
     new_mailbox->messages = NULL;
     new_mailbox->next = NULL;
-    if (previous == NULL) {
-        *mailboxes = new_mailbox; // La liste était vide
-    } else {
-        previous->next = new_mailbox; // Ajouter la nouvelle boite aux lettres à la fin de la liste
-    }
+    previous->next = new_mailbox; // Ajouter la nouvelle boite aux lettres à la fin de la liste
 
-    return current; // La boite aux lettres existe déjà
+    return new_mailbox;
 }
 
 void free_mailboxes(mailbox **mailboxes) {
@@ -37,12 +46,21 @@ void free_mailboxes(mailbox **mailboxes) {
     mailbox *next;
 
     while (current != NULL) {
+        // Libérer les messages de cette boite
+        message *msg = current->messages;
+        while (msg != NULL) {
+            message *next_msg = msg->next;
+            free(msg->content);
+            free(msg);
+            msg = next_msg;
+        }
+
         next = current->next;
         free(current);
         current = next;
     }
 
-    *mailboxes = NULL; // Réinitialiser la liste
+    *mailboxes = NULL;
 }
 
 int add_message(mailbox *mail_box, char *msg, int length) {

@@ -94,7 +94,7 @@ int server(int port) {
     construire_adresse_local(port, local_address);
     
     // Lier le socket à l'adresse locale 
-    bind(sock, local_address, sizeof(struct sockaddr_in));
+    bind(sock,(struct sockaddr *) local_address, sizeof(struct sockaddr_in));
 
     // Écouter les connexions entrantes
     listen(sock, 5);
@@ -112,7 +112,7 @@ int server(int port) {
         struct sockaddr_in* source_address = (struct sockaddr_in*) malloc(sizeof(struct sockaddr_in));
         socklen_t source_size = (socklen_t) sizeof(struct sockaddr_in);
         // Accepter une nouvelle connexion
-        int allocated_sock = accept(sock, source_address, &source_size);
+        int allocated_sock = accept(sock, (struct sockaddr *)source_address, &source_size);
         if (allocated_sock == -1) {
             perror("SERVER: socket not created");
             continue;

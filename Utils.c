@@ -45,7 +45,7 @@ char* genere_message(int n, int N) {
     }
 
     // Ajouter un '\0' à la fin du message pour le rendre une chaîne valide
-    message[N+1] = '\0';
+    message[N] = '\0';
 
     return message;
 }

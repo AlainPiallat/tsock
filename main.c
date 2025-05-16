@@ -35,7 +35,7 @@ int puit_UDP_aff(int port, int taille_max, int n) {
 	construire_adresse_local(port, adresse_local);
 	 
 	// Lier le socket à l'adresse locale 
-	bind(sock, adresse_local, sizeof(struct sockaddr_in));
+	bind(sock,(struct sockaddr *) adresse_local, sizeof(struct sockaddr_in));
 	
 	// informe de l'ouverture du puit
 	if (n != -1)
@@ -50,8 +50,9 @@ int puit_UDP_aff(int port, int taille_max, int n) {
 		// Lire un message du client 
 		struct sockaddr* adresse_expediteur = (struct sockaddr*) malloc(sizeof(struct sockaddr));
 		socklen_t taille_expediteur;
-		char message[taille_max];
+		char message[taille_max+1];
 		if(recvfrom(sock, message, taille_max, 0, adresse_expediteur, &taille_expediteur) != -1) {
+			message[taille_max] = '\0'; // Assurer que le message est bien terminé par un '\0'
 			printf("PUITS: Reception n°%d (%ld) [%s]\n", nb_receptions, strlen(message), message);
 
 			// Incrémenter le nombre de réceptions
@@ -100,7 +101,7 @@ int source_UDP_aff(char* dest, int port, int n, int l) {
 		printf("SOURCE: Envoi n°%d (%d) [%s]\n", i, taille_message, message);
 
 		// Envoyer le message 
-		sendto(sock, message, taille_message, 0, adresse_dest, sizeof(struct sockaddr_in)); 
+		sendto(sock, message, taille_message, 0,(struct sockaddr *) adresse_dest, sizeof(struct sockaddr_in)); 
 	}
 	
 	// Informer de la fin de l'envoi
@@ -154,7 +155,7 @@ int puit_TCP_aff(int port, int taille_max, int n) {
 	construire_adresse_local(port, adresse_local);
 	
 	// Lier le socket à l'adresse locale 
-	bind(sock, adresse_local, sizeof(struct sockaddr_in));
+	bind(sock,(struct sockaddr *) adresse_local, sizeof(struct sockaddr_in));
 	
 	// Mettre le socket en écoute pour accepter les connexions entrantes 
 	listen(sock, 5);
@@ -171,7 +172,7 @@ int puit_TCP_aff(int port, int taille_max, int n) {
 		struct sockaddr_in* adresse_source = (struct sockaddr_in*) malloc(sizeof(struct sockaddr_in));
 		socklen_t taille_source = sizeof(struct sockaddr_in);
 		// Accèpter une nouvelle connexion 
-		int sock_alloue = accept(sock, adresse_source, &taille_source);
+		int sock_alloue = accept(sock,(struct sockaddr *) adresse_source, &taille_source);
 		if (sock_alloue != -1) {
 			// Informer de la connexion
 			printf("PUITS: connexion acceptée\n");
@@ -204,7 +205,7 @@ int source_TCP_aff(char* dest, int port, int n, int l) {
 	
 	// Tenter d'établir la connexion jusqu'à ce qu'elle réussisse
 	int nb_essais = 0;
-	while (connect(sock, adresse_dest, sizeof(struct sockaddr_in)) != 0) {
+	while (connect(sock,(struct sockaddr *) adresse_dest, sizeof(struct sockaddr_in)) != 0) {
 		nb_essais++;
 		sleep(1);
 		if (nb_essais > 3) {
@@ -262,7 +263,7 @@ int main(int argc, char **argv) {
     extern char *optarg;
     extern int optind;
 
-    int nb_message = 10;  	// Nombre de messages à envoyer ou à recevoir
+    int nb_message = -1;  	// Nombre de messages à envoyer ou à recevoir
     int len_message = 30; 	// Taille des messages
 	int bal_num = -1;		// Numéro de la boîte aux lettres
     int mode = -1;        	// 0=puits, 1=source, 2=boite aux lettres, 3=émetteur, 4=récepteur
@@ -290,7 +291,7 @@ int main(int argc, char **argv) {
                 break;
 
 			case 'u':
-				int protocol = 1; // Protocole UDP
+				protocol = 1; // Protocole UDP
 				break;
 
             case 'b':
@@ -388,6 +389,7 @@ int main(int argc, char **argv) {
                 printf("Erreur : le nom d'hôte est requis pour le mode source.\n");
                 exit(1);
             }
+			if (nb_message == -1) nb_message = 10;
 			if (protocol == 1) {
 				printf("Mode : Source (UDP)\n");
 				source_UDP_aff(hostname, port, nb_message, len_message);
@@ -408,6 +410,7 @@ int main(int argc, char **argv) {
                 printf("Erreur : le nom d'hôte est requis pour le mode émetteur.\n");
                 exit(1);
             }
+			if (nb_message == -1) nb_message = 10;
             emitter(hostname, port, len_message, nb_message, bal_num);
             break;
 

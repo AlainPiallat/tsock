@@ -119,7 +119,7 @@ int server(int port) {
         }
         
         // Récupérer le message d'initialisation
-        char message[13];
+        char message[14];
         int message_size = sizeof(message);
         recv(allocated_sock, message, message_size, 0);
         printf("SERVER: initialisation message received\n");
@@ -140,7 +140,7 @@ int server(int port) {
             int mailbox_number = mailbox_number_str.i;
 
             // Afficher les informations récupérées
-            printf("SERVER: message_length=%d, message_count=%d, mailbox_number=%d\n", message_length, message_count, mailbox_number);
+            printf("SERVER_SENDER: message_length=%d, message_count=%d, mailbox_number=%d\n", message_length, message_count, mailbox_number);
 
             // récupérer la boîte aux lettres
             mailbox* mbox = get_mailbox(&mbox_list, mailbox_number);
@@ -161,7 +161,7 @@ int server(int port) {
             int mailbox_number = mailbox_number_str.i;
 
             // Afficher les informations récupérées
-            printf("SERVER: mailbox_number=%d\n", mailbox_number);
+            printf("SERVER_RECEIVER: mailbox_number=%d\n", mailbox_number);
 
             // récupérer la boîte aux lettres
             mailbox* mbox = get_mailbox(&mbox_list, mailbox_number);
